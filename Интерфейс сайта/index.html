@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система бизнес-аналитики</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Главная страница - выбор организации -->
+        <div id="home-view" class="view">
+            <div class="container">
+                <div class="py-16">
+                    <h1 class="mb-8">Система бизнес-аналитики</h1>
+                    <p class="mb-8" style="color: var(--color-text-secondary);">Выберите организацию или создайте новую</p>
+                    
+                    <div class="flex justify-between items-center mb-8">
+                        <h2>Ваши организации</h2>
+                        <button class="btn btn--primary" id="create-org-btn" type="button">+ Создать организацию</button>
+                    </div>
+                    
+                    <div id="organizations-grid" class="organizations-grid">
+                        <!-- Организации будут загружены динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница организации с дашбордом -->
+        <div id="org-view" class="view hidden">
+            <div class="container">
+                <div class="py-16">
+                    <div class="org-header">
+                        <button class="btn btn--outline mb-8" id="back-home-btn" type="button">← Назад</button>
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h1 id="org-title" class="mb-8"></h1>
+                                <div class="org-info">
+                                    <span class="status" id="tax-regime-badge"></span>
+                                    <span class="org-details" id="org-details"></span>
+                                </div>
+                            </div>
+                            <div class="flex gap-8">
+                                <button class="btn btn--primary" id="show-tools-btn" type="button">Аналитические инструменты</button>
+                                <button class="btn btn--secondary" id="show-tax-calendar-btn" type="button">Налоговый календарь</button>
+                                <button class="btn btn--outline" id="generate-data-btn" type="button">Тестовые данные</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Обобщенная аналитика в шапке -->
+                    <div class="dashboard-section mb-8">
+                        <h2 class="mb-8">Ключевые показатели (2025 год)</h2>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value" id="total-income">0 ₽</div>
+                                <div class="metric-label">Общий доход</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="total-expenses">0 ₽</div>
+                                <div class="metric-label">Общие расходы</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="total-profit">0 ₽</div>
+                                <div class="metric-label">Общая прибыль</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value" id="total-taxes">0 ₽</div>
+                                <div class="metric-label">Общие налоги</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Аналитика по кварталам -->
+                    <div class="quarterly-analytics mb-8">
+                        <h2 class="mb-8">Аналитика по периодам</h2>
+                        <div class="quarters-container">
+                            <!-- Q1 2025 -->
+                            <div class="quarter-block">
+                                <div class="quarter-header" data-quarter="Q1">
+                                    <h3>Q1 2025 (Январь - Март)</h3>
+                                    <div class="quarter-metrics">
+                                        <span class="quarter-metric">Доход: <span id="q1-income">0 ₽</span></span>
+                                        <span class="quarter-metric">Расходы: <span id="q1-expenses">0 ₽</span></span>
+                                        <span class="quarter-metric">Прибыль: <span id="q1-profit">0 ₽</span></span>
+                                    </div>
+                                    <button class="quarter-toggle">▼</button>
+                                </div>
+                                <div class="quarter-content" id="quarter-Q1">
+                                    <div class="months-container">
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-01">
+                                                <h4>Январь 2025</h4>
+                                                <span class="month-profit" id="month-2025-01-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-01"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-02">
+                                                <h4>Февраль 2025</h4>
+                                                <span class="month-profit" id="month-2025-02-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-02"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-03">
+                                                <h4>Март 2025</h4>
+                                                <span class="month-profit" id="month-2025-03-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-03"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Q2 2025 -->
+                            <div class="quarter-block">
+                                <div class="quarter-header" data-quarter="Q2">
+                                    <h3>Q2 2025 (Апрель - Июнь)</h3>
+                                    <div class="quarter-metrics">
+                                        <span class="quarter-metric">Доход: <span id="q2-income">0 ₽</span></span>
+                                        <span class="quarter-metric">Расходы: <span id="q2-expenses">0 ₽</span></span>
+                                        <span class="quarter-metric">Прибыль: <span id="q2-profit">0 ₽</span></span>
+                                    </div>
+                                    <button class="quarter-toggle">▼</button>
+                                </div>
+                                <div class="quarter-content" id="quarter-Q2">
+                                    <div class="months-container">
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-04">
+                                                <h4>Апрель 2025</h4>
+                                                <span class="month-profit" id="month-2025-04-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-04"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-05">
+                                                <h4>Май 2025</h4>
+                                                <span class="month-profit" id="month-2025-05-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-05"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-06">
+                                                <h4>Июнь 2025</h4>
+                                                <span class="month-profit" id="month-2025-06-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-06"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Q3 2025 -->
+                            <div class="quarter-block">
+                                <div class="quarter-header" data-quarter="Q3">
+                                    <h3>Q3 2025 (Июль - Сентябрь)</h3>
+                                    <div class="quarter-metrics">
+                                        <span class="quarter-metric">Доход: <span id="q3-income">0 ₽</span></span>
+                                        <span class="quarter-metric">Расходы: <span id="q3-expenses">0 ₽</span></span>
+                                        <span class="quarter-metric">Прибыль: <span id="q3-profit">0 ₽</span></span>
+                                    </div>
+                                    <button class="quarter-toggle">▼</button>
+                                </div>
+                                <div class="quarter-content" id="quarter-Q3">
+                                    <div class="months-container">
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-07">
+                                                <h4>Июль 2025</h4>
+                                                <span class="month-profit" id="month-2025-07-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-07"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-08">
+                                                <h4>Август 2025</h4>
+                                                <span class="month-profit" id="month-2025-08-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-08"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-09">
+                                                <h4>Сентябрь 2025</h4>
+                                                <span class="month-profit" id="month-2025-09-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-09"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Q4 2025 -->
+                            <div class="quarter-block">
+                                <div class="quarter-header" data-quarter="Q4">
+                                    <h3>Q4 2025 (Октябрь - Декабрь)</h3>
+                                    <div class="quarter-metrics">
+                                        <span class="quarter-metric">Доход: <span id="q4-income">0 ₽</span></span>
+                                        <span class="quarter-metric">Расходы: <span id="q4-expenses">0 ₽</span></span>
+                                        <span class="quarter-metric">Прибыль: <span id="q4-profit">0 ₽</span></span>
+                                    </div>
+                                    <button class="quarter-toggle">▼</button>
+                                </div>
+                                <div class="quarter-content" id="quarter-Q4">
+                                    <div class="months-container">
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-10">
+                                                <h4>Октябрь 2025</h4>
+                                                <span class="month-profit" id="month-2025-10-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-10"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-11">
+                                                <h4>Ноябрь 2025</h4>
+                                                <span class="month-profit" id="month-2025-11-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-11"></div>
+                                        </div>
+                                        <div class="month-block">
+                                            <div class="month-header" data-month="2025-12">
+                                                <h4>Декабрь 2025</h4>
+                                                <span class="month-profit" id="month-2025-12-profit">0 ₽</span>
+                                                <button class="month-toggle">▼</button>
+                                            </div>
+                                            <div class="month-content" id="month-2025-12"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ввод ежедневных операций -->
+                    <div class="daily-operations mb-8">
+                        <h2 class="mb-8">Ежедневные операции</h2>
+                        <div class="card">
+                            <div class="card__body">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Дата операции</label>
+                                        <input type="date" class="form-control" id="operation-date" value="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Тип операции</label>
+                                        <select class="form-control" id="operation-type">
+                                            <option value="income">Доход</option>
+                                            <option value="expense">Расход</option>
+                                            <option value="tax-payment">Налоговый платеж</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Сумма (руб.)</label>
+                                        <input type="number" class="form-control" id="operation-amount" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Описание</label>
+                                        <input type="text" class="form-control" id="operation-description" placeholder="Описание операции">
+                                    </div>
+                                </div>
+                                <div class="flex justify-end mt-8">
+                                    <button class="btn btn--primary" id="add-operation-btn" type="button">Добавить операцию</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Накопительные данные -->
+                    <div class="tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-button active" data-tab="finance">Финансы</button>
+                            <button class="tab-button" data-tab="sales">Продажи</button>
+                            <button class="tab-button" data-tab="marketing">Маркетинг</button>
+                            <button class="tab-button" data-tab="logistics">Логистика</button>
+                            <button class="tab-button" data-tab="hr">Персонал</button>
+                        </div>
+
+                        <!-- Финансовые данные -->
+                        <div id="finance-tab" class="tab-content active">
+                            <div class="data-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Выручка (руб.)</label>
+                                        <input type="number" class="form-control" id="revenue" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Себестоимость (руб.)</label>
+                                        <input type="number" class="form-control" id="cogs" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Операционные расходы (руб.)</label>
+                                        <input type="number" class="form-control" id="opex" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Дебиторская задолженность (руб.)</label>
+                                        <input type="number" class="form-control" id="receivables" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Кредиторская задолженность (руб.)</label>
+                                        <input type="number" class="form-control" id="payables" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Оборотные активы (руб.)</label>
+                                        <input type="number" class="form-control" id="current_assets" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Остальные вкладки -->
+                        <div id="sales-tab" class="tab-content">
+                            <div class="data-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Количество клиентов</label>
+                                        <input type="number" class="form-control" id="customers" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Средний чек (руб.)</label>
+                                        <input type="number" class="form-control" id="avg_check" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Конверсия (%)</label>
+                                        <input type="number" class="form-control" id="conversion" placeholder="0" min="0" max="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Количество сделок</label>
+                                        <input type="number" class="form-control" id="deals_count" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="marketing-tab" class="tab-content">
+                            <div class="data-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Маркетинговые расходы (руб.)</label>
+                                        <input type="number" class="form-control" id="marketing_spend" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">CAC (Стоимость привлечения клиента)</label>
+                                        <input type="number" class="form-control" id="cac" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">LTV (Пожизненная ценность клиента)</label>
+                                        <input type="number" class="form-control" id="ltv" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="logistics-tab" class="tab-content">
+                            <div class="data-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Запасы на складе (руб.)</label>
+                                        <input type="number" class="form-control" id="inventory" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Логистические затраты (руб.)</label>
+                                        <input type="number" class="form-control" id="logistics_costs" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="hr-tab" class="tab-content">
+                            <div class="data-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Количество сотрудников</label>
+                                        <input type="number" class="form-control" id="employees" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Фонд оплаты труда (руб.)</label>
+                                        <input type="number" class="form-control" id="payroll" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-8">
+                        <button class="btn btn--primary" id="save-data-btn" type="button">Сохранить данные</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Налоговый календарь -->
+        <div id="tax-calendar-view" class="view hidden">
+            <div class="container">
+                <div class="py-16">
+                    <button class="btn btn--outline mb-8" id="back-org-from-calendar-btn" type="button">← Назад к организации</button>
+                    <h1 class="mb-8">Налоговый календарь</h1>
+                    <div id="tax-calendar-content">
+                        <!-- Календарь будет загружен динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница аналитических инструментов -->
+        <div id="tools-view" class="view hidden">
+            <div class="container">
+                <div class="py-16">
+                    <button class="btn btn--outline mb-8" id="back-org-btn" type="button">← Назад к данным</button>
+                    <h1 class="mb-8">Аналитические инструменты</h1>
+                    
+                    <div class="filter-bar mb-8">
+                        <select class="form-control" id="category-filter">
+                            <option value="">Все категории</option>
+                            <option value="finance">Финансы</option>
+                            <option value="sales">Продажи</option>
+                            <option value="marketing">Маркетинг</option>
+                            <option value="logistics">Логистика</option>
+                            <option value="hr">Персонал</option>
+                        </select>
+                    </div>
+
+                    <div id="tools-grid" class="tools-grid">
+                        <!-- Инструменты будут загружены динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница инструмента -->
+        <div id="tool-view" class="view hidden">
+            <div class="container">
+                <div class="py-16">
+                    <button class="btn btn--outline mb-8" id="back-tools-btn" type="button">← Назад к инструментам</button>
+                    <div id="tool-content">
+                        <!-- Контент инструмента загружается динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания организации -->
+    <div id="create-org-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Создать новую организацию</h3>
+                <button class="modal-close" id="modal-close-btn" type="button">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Название организации *</label>
+                    <input type="text" class="form-control" id="new-org-name" placeholder="Введите название" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Описание деятельности</label>
+                    <textarea class="form-control" id="new-org-description" placeholder="Краткое описание деятельности" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Организационно-правовая форма *</label>
+                    <select class="form-control" id="new-org-legal-form" required>
+                        <option value="">Выберите форму</option>
+                        <option value="ip">ИП</option>
+                        <option value="ooo">ООО</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Система налогообложения *</label>
+                    <select class="form-control" id="new-org-tax-regime" required>
+                        <option value="">Выберите режим</option>
+                        <option value="usn_income">УСН "Доходы" (6%)</option>
+                        <option value="usn_profit">УСН "Доходы-расходы" (15%)</option>
+                        <option value="osno">ОСНО</option>
+                        <option value="patent">Патент</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Регион деятельности *</label>
+                    <select class="form-control" id="new-org-region" required>
+                        <option value="">Выберите регион</option>
+                        <option value="moscow">Москва</option>
+                        <option value="spb">Санкт-Петербург</option>
+                        <option value="moscow_region">Московская область</option>
+                        <option value="other">Другой регион</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Основной вид деятельности (ОКВЭД)</label>
+                    <input type="text" class="form-control" id="new-org-okved" placeholder="Например: 62.01 - Разработка ПО">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Количество сотрудников</label>
+                    <select class="form-control" id="new-org-employees">
+                        <option value="0">0</option>
+                        <option value="1-5">1-5</option>
+                        <option value="6-15">6-15</option>
+                        <option value="16-100">16-100</option>
+                        <option value="100+">100+</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Дата регистрации</label>
+                    <input type="date" class="form-control" id="new-org-registration-date">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline" id="modal-cancel-btn" type="button">Отмена</button>
+                <button class="btn btn--primary" id="modal-create-btn" type="button">Создать организацию</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
