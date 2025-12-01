@@ -151,11 +151,14 @@ function setupModalEventListeners() {
     }
     
     if (modalCreateBtn) {
+        console.log('%c[SETUP] Кнопка #modal-create-btn НАЙДЕНА. Назначаю обработчик...', 'color: green');
         modalCreateBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Создание организации');
+            console.log('[EVENT] Клик по кнопке #modal-create-btn');
             createOrganization();
         });
+    } else {
+        console.error('%c[SETUP] Кнопка #modal-create-btn НЕ НАЙДЕНА!', 'color: red; font-weight: bold;');
     }
     
     if (modalOverlay) {
@@ -339,11 +342,16 @@ function loadOrganizations() {
 }
 
 function saveOrganizations() {
+    console.log('[SAVE] Вызвана функция saveOrganizations.');
+    console.log('[SAVE] Данные для сохранения:', JSON.stringify(organizations, null, 2));
     try {
+        if (!organizations || Object.keys(organizations).length === 0) {
+            console.warn('[SAVE] Попытка сохранить пустой объект организаций. Это может быть нормально при удалении последней организации.');
+        }
         localStorage.setItem('organizations', JSON.stringify(organizations));
-        console.log('Организации сохранены:', Object.keys(organizations).length);
+        console.log('%c[SAVE] Успешно сохранено в localStorage!', 'color: green; font-weight: bold;');
     } catch (error) {
-        console.error('Ошибка сохранения организаций:', error);
+        console.error('%c[SAVE] КРИТИЧЕСКАЯ ОШИБКА при сохранении в localStorage:', 'color: red; font-weight: bold;', error);
     }
 }
 
@@ -393,8 +401,7 @@ function createOrganization() {
         };
         
         organizations[orgId] = newOrg;
-        console.log('Организация создана:', newOrg);
-        
+        console.log('Попытка сохранить организацию...');
         saveOrganizations();
         hideCreateOrgModal();
         renderOrganizations();
@@ -863,6 +870,7 @@ function addDailyOperation() {
         updateAccumulatedData(operation);
         
         organizations[currentOrganization.id] = currentOrganization;
+        console.log('[ADD OP] Попытка сохранить данные после добавления операции...');
         saveOrganizations();
         
         // Очищаем форму
